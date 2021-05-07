@@ -56,3 +56,17 @@ class BadgeToken(TxFactory):
         tx = self.template(sender_address, None, use_nonce=True)
         tx = self.set_code(tx, code)
         return self.finalize(tx, tx_format)
+
+
+    def mint_to(self, contract_address, sender_address, address, token_id, tx_format=TxFormat.JSONRPC):
+        enc = ABIContractEncoder()
+        enc.method('mintTo')
+        enc.typ(ABIContractType.ADDRESS)
+        enc.typ(ABIContractType.UINT256)
+        enc.address(address)
+        enc.uint256(token_id)
+        data = enc.get()
+        tx = self.template(sender_address, contract_address, use_nonce=True)
+        tx = self.set_code(tx, data)
+        tx = self.finalize(tx, tx_format)
+        return tx

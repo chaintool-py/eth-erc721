@@ -45,7 +45,14 @@ class Test(EthTesterCase):
 
     
     def test_mint(self):
-        pass
+        nonce_oracle = RPCNonceOracle(self.accounts[0], self.rpc)
+        c = BadgeToken(self.chain_spec, signer=self.signer, nonce_oracle=nonce_oracle)
+        (tx_hash_hex, o) = c.mint_to(self.address, self.accounts[0], self.accounts[1], int.from_bytes(b'\xee' * 32, byteorder='big'))
+        r = self.rpc.do(o)
+
+        o = receipt(tx_hash_hex)
+        r = self.conn.do(o)
+        self.assertEqual(r['status'], 1)
 
 
 if __name__ == '__main__':

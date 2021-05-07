@@ -152,7 +152,7 @@ contract BadgeToken {
 	// Minter
 	function mintTo(address _beneficiary, uint256 _tokenId) external returns (bool) {
 		require(owner == msg.sender);
-		require(tokenIndex[_tokenId] == 0x0);
+		require(tokenIndex[_tokenId] == 0x0 || token.length == 0);
 
 		uint256 newTokenIndex;
 		uint256 newTokenId;
