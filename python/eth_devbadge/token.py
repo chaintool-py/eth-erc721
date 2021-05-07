@@ -9,6 +9,13 @@ from chainlib.eth.tx import (
 from chainlib.eth.contract import (
         ABIContractEncoder,
         ABIContractType,
+        abi_decode_single,
+        )
+from chainlib.jsonrpc import jsonrpc_template
+from chainlib.eth.constant import ZERO_ADDRESS
+from hexathon import (
+        add_0x,
+        strip_0x,
         )
 
 # local imports
@@ -70,3 +77,23 @@ class BadgeToken(TxFactory):
         tx = self.set_code(tx, data)
         tx = self.finalize(tx, tx_format)
         return tx
+
+
+    def owner_of(self, contract_address, token_id, sender_address=ZERO_ADDRESS):
+        o = jsonrpc_template()
+        o['method'] = 'eth_call'
+        enc = ABIContractEncoder()
+        enc.method('ownerOf')
+        enc.typ(ABIContractType.UINT256)
+        enc.uint256(token_id)
+        data = add_0x(enc.get())
+        tx = self.template(sender_address, contract_address)
+        tx = self.set_code(tx, data)
+        o['params'].append(self.normalize(tx))
+        o['params'].append('latest')
+        return o
+
+
+    @classmethod
+    def parse_owner_of(self, v):
+        return abi_decode_single(ABIContractType.ADDRESS, v)
