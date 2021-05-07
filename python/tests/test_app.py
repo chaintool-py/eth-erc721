@@ -73,5 +73,18 @@ class Test(EthTesterCase):
         self.assertEqual(self.accounts[1], owner_address)
 
 
+    def test_transfer(self):
+        token_id = int.from_bytes(b'\xee' * 32, byteorder='big')
+        c = self._mint(self.accounts[1], token_id)
+
+        (tx_hash_hex, o) = c.transfer_from(self.address, self.accounts[1], self.accounts[1], self.accounts[2], token_id)
+        r = self.rpc.do(o)
+
+        o = receipt(tx_hash_hex)
+        r = self.conn.do(o)
+        self.assertEqual(r['status'], 1)
+
+
+
 if __name__ == '__main__':
     unittest.main()

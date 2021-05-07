@@ -79,6 +79,24 @@ class BadgeToken(TxFactory):
         return tx
 
 
+    def transfer_from(self, contract_address, sender_address, holder_address, beneficiary_address, token_id, tx_format=TxFormat.JSONRPC):
+        enc = ABIContractEncoder()
+        enc.method('transferFrom')
+        enc.typ(ABIContractType.ADDRESS)
+        enc.typ(ABIContractType.ADDRESS)
+        enc.typ(ABIContractType.UINT256)
+        enc.address(holder_address)
+        enc.address(beneficiary_address)
+        enc.uint256(token_id)
+        data = enc.get()
+        tx = self.template(sender_address, contract_address, use_nonce=True)
+        tx = self.set_code(tx, data)
+        tx = self.finalize(tx, tx_format)
+        return tx
+
+
+
+
     def owner_of(self, contract_address, token_id, sender_address=ZERO_ADDRESS):
         o = jsonrpc_template()
         o['method'] = 'eth_call'
