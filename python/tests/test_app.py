@@ -18,6 +18,7 @@ from chainlib.eth.contract import (
         abi_decode_single,
         ABIContractType,
         )
+from chainlib.error import JSONRPCException
 from hexathon import (
         add_0x,
         strip_0x,
@@ -71,6 +72,12 @@ class Test(EthTesterCase):
         r = self.rpc.do(o)
         self.assertEqual(token_bytes.hex(), strip_0x(r))
 
+        o = c.total_supply(self.address, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        supply = c.parse_total_supply(r)
+
+        self.assertEqual(supply, 1)
+
 
     def test_owner(self):
         token_bytes = b'\xee' * 32
@@ -85,12 +92,12 @@ class Test(EthTesterCase):
 
         o = c.token_of_owner_by_index(self.address, self.accounts[1], 0, sender_address=self.accounts[0])
         r = self.rpc.do(o)
-
         self.assertEqual(token_bytes.hex(), strip_0x(r))
 
 
     def test_transfer(self):
-        token_id = int.from_bytes(b'\xee' * 32, byteorder='big')
+        token_bytes = b'\xee' * 32
+        token_id = int.from_bytes(token_bytes, byteorder='big')
         c = self._mint(self.accounts[1], token_id)
 
         nonce_oracle = RPCNonceOracle(self.accounts[1], self.rpc)
@@ -102,7 +109,14 @@ class Test(EthTesterCase):
         r = self.conn.do(o)
         self.assertEqual(r['status'], 1)
 
+        o = c.token_of_owner_by_index(self.address, self.accounts[1], 0, sender_address=self.accounts[0])
+        with self.assertRaises(JSONRPCException):
+            r = self.rpc.do(o)
 
 
+        o = c.token_of_owner_by_index(self.address, self.accounts[2], 0, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        self.assertEqual(token_bytes.hex(), strip_0x(r))
+       
 if __name__ == '__main__':
     unittest.main()
