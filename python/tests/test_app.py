@@ -77,6 +77,8 @@ class Test(EthTesterCase):
         token_id = int.from_bytes(b'\xee' * 32, byteorder='big')
         c = self._mint(self.accounts[1], token_id)
 
+        nonce_oracle = RPCNonceOracle(self.accounts[1], self.rpc)
+        c = BadgeToken(self.chain_spec, signer=self.signer, nonce_oracle=nonce_oracle)
         (tx_hash_hex, o) = c.transfer_from(self.address, self.accounts[1], self.accounts[1], self.accounts[2], token_id)
         r = self.rpc.do(o)
 
