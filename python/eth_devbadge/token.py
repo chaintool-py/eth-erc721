@@ -95,6 +95,19 @@ class BadgeToken(TxFactory):
         return tx
 
 
+    def token_by_index(self, contract_address, idx, sender_address=ZERO_ADDRESS):
+        o = jsonrpc_template()
+        o['method'] = 'eth_call'
+        enc = ABIContractEncoder()
+        enc.method('tokenByIndex')
+        enc.typ(ABIContractType.UINT256)
+        enc.uint256(idx)
+        data = add_0x(enc.get())
+        tx = self.template(sender_address, contract_address)
+        tx = self.set_code(tx, data)
+        o['params'].append(self.normalize(tx))
+        o['params'].append('latest')
+        return o
 
 
     def owner_of(self, contract_address, token_id, sender_address=ZERO_ADDRESS):
@@ -115,3 +128,8 @@ class BadgeToken(TxFactory):
     @classmethod
     def parse_owner_of(self, v):
         return abi_decode_single(ABIContractType.ADDRESS, v)
+
+
+    @classmethod
+    def parse_token_by_index(self, v):
+        return abi_decode_single(ABIContractType.UINT256, v)

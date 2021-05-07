@@ -18,6 +18,11 @@ from chainlib.eth.contract import (
         abi_decode_single,
         ABIContractType,
         )
+from hexathon import (
+        add_0x,
+        strip_0x,
+        )
+
 
 # local imports
 from eth_devbadge.token import BadgeToken
@@ -58,8 +63,13 @@ class Test(EthTesterCase):
 
 
     def test_mint(self):
-        token_id = int.from_bytes(b'\xee' * 32, byteorder='big')
+        token_bytes = b'\xee' * 32
+        token_id = int.from_bytes(token_bytes, byteorder='big')
         c = self._mint(self.accounts[1], token_id)
+
+        o = c.token_by_index(self.address, 0, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        self.assertEqual(token_bytes.hex(), strip_0x(r))
 
 
     def test_owner(self):
@@ -71,6 +81,7 @@ class Test(EthTesterCase):
         owner_address = c.parse_owner_of(r)
 
         self.assertEqual(self.accounts[1], owner_address)
+
 
 
     def test_transfer(self):
