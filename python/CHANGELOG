@@ -1,0 +1,4 @@
+- 0.0.1
+	* Add erc721 interface
+	* Add BadgeToken contract
+	* Add Minter functions to python interface

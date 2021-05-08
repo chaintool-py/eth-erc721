@@ -49,7 +49,7 @@ class BadgeToken(ERC721):
 
     @staticmethod
     def gas(code=None):
-        return 1200000
+        return 2700000
 
     
     def constructor(self, sender_address, declarator, name, symbol, tx_format=TxFormat.JSONRPC):
