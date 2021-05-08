@@ -27,7 +27,7 @@ from hexathon import (
 
 
 # local imports
-from eth_badge.token import BadgeToken
+from eth_badge_token import BadgeToken
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()

@@ -157,12 +157,12 @@ contract BadgeToken {
 	}
 
 	// TODO: move to library function?
-	function toAscii(bytes32 _data) public pure returns(string memory) {
+	function toURI(bytes32 _data) public pure returns(string memory) {
 		bytes memory out;
 		uint8 t;
 		uint256 c;
 
-		out = new bytes(64 + 9);
+		out = new bytes(64 + 7);
 		out[0] = "s";
 		out[1] = "h";
 		out[2] = "a";
@@ -170,18 +170,16 @@ contract BadgeToken {
 		out[4] = "5";
 		out[5] = "6";
 		out[6] = ":";
-		out[7] = "/";
-		out[8] = "/";
 		
-		c = 9;	
+		c = 7;	
 		for (uint256 i = 0; i < 32; i++) {
-			t = uint8(_data[i]) & 0x0f;
+			t = (uint8(_data[i]) & 0xf0) >> 4;
 			if (t < 10) {
 				out[c] = bytes1(t + 0x30);
 			} else {
 				out[c] = bytes1(t + 0x57);
 			}
-			t = (uint8(_data[i]) & 0xf0) >> 4;
+			t = uint8(_data[i]) & 0x0f;
 			if (t < 10) {
 				out[c+1] = bytes1(t + 0x30);
 			} else {
@@ -194,7 +192,7 @@ contract BadgeToken {
 
 	// ERC-721 (Metadata - optional)
 	function tokenURI(uint256 _tokenId) public view returns (string memory) {
-		return toAscii(bytes32(token[tokenIndex[_tokenId]]));
+		return toURI(bytes32(token[tokenIndex[_tokenId]]));
 	}
 
 	// Minter
@@ -209,6 +207,7 @@ contract BadgeToken {
 		newTokenId = uint256(_tokenId);
 
 		token.push(newTokenId);
+		tokenIndex[newTokenId] = newTokenIndex;
 		tokenMintedAt.push(block.number);
 		tokenOwner[newTokenId] = _beneficiary;
 		tokenOwnerIdIndex[tokenOwnerIndex[_beneficiary].length] = _tokenId;
