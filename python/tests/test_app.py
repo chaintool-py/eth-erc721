@@ -27,7 +27,7 @@ from hexathon import (
 
 
 # local imports
-from eth_devbadge.token import BadgeToken
+from eth_badge.token import BadgeToken
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -78,7 +78,6 @@ class Test(EthTesterCase):
         o = c.total_supply(self.address, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         supply = c.parse_total_supply(r)
-
         self.assertEqual(supply, 1)
 
         o = c.minted_at(self.address, token_id, sender_address=self.accounts[0])
@@ -96,7 +95,6 @@ class Test(EthTesterCase):
         o = c.owner_of(self.address, token_id, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         owner_address = c.parse_owner_of(r)
-
         self.assertEqual(self.accounts[1], owner_address)
 
         o = c.token_of_owner_by_index(self.address, self.accounts[1], 0, sender_address=self.accounts[0])
@@ -215,7 +213,37 @@ class Test(EthTesterCase):
         o = c.token_of_owner_by_index(self.address, self.accounts[2], 0, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         self.assertEqual(token_bytes.hex(), strip_0x(r))
-      
+     
+
+    def test_contract_ownership(self):
+        token_bytes = [
+            b'\xee' * 32,
+            b'\xdd' * 32,
+            b'\xcc' * 32,
+            ]
+        token_ids = []
+        for t in token_bytes:
+            token_id = int.from_bytes(t, byteorder='big')
+            token_ids.append(token_id)
+            c = self._mint(self.accounts[0], token_id)
+
+        o = c.total_supply(self.address, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        supply = c.parse_total_supply(r)
+        self.assertEqual(supply, 3)
+
+        (tx_hash_hex, o) = c.transfer_ownership(self.address, self.accounts[0], self.accounts[4])
+        r = self.rpc.do(o)
+        o = receipt(tx_hash_hex)
+        r = self.conn.do(o)
+        self.assertEqual(r['status'], 1)
+
+        for t in token_ids:
+            o = c.owner_of(self.address, token_id, sender_address=self.accounts[0])
+            r = self.rpc.do(o)
+            owner_address = c.parse_owner_of(r)
+            self.assertEqual(self.accounts[4], owner_address)
+
 
 if __name__ == '__main__':
     unittest.main()

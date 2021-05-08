@@ -2,8 +2,11 @@ pragma solidity ^0.8.0;
 
 contract BadgeToken {
 
-	address public declarator;
+	// EIP 173
 	address public owner;
+
+	// Points to Declarator implementer
+	address public declarator;
 	
 	uint256[] token;
 	uint256[] tokenMintedAt;
@@ -32,6 +35,9 @@ contract BadgeToken {
 	// ERC-721
 	event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
+	// EIP-173
+	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
 	event TransferWithData(address indexed _from, address indexed _to, uint256 indexed _tokenId, bytes32 _data);
 
 	// Minter
@@ -43,6 +49,7 @@ contract BadgeToken {
 		name = _name;
 		symbol = _symbol;
 	}
+
 
 	// ERC-721
 	function balanceOf(address _owner) external view returns (uint256) {
@@ -180,6 +187,28 @@ contract BadgeToken {
 
 		return tokenMintedAt[_tokenIndex];
 	}
+
+	// EIP-173
+	function transferOwnership(address _newOwner) external returns (bool) {
+		require(msg.sender == owner);
+
+		bytes memory zeroData;
+		address previousOwner;
+		uint256[] memory currentTokenOwnerIndex; // investigate; if source is storage, which of memory or storage does a copy
+
+		previousOwner = owner;
+		currentTokenOwnerIndex = tokenOwnerIndex[previousOwner];
+
+		for (uint256 i; i < currentTokenOwnerIndex.length; i++) {
+			transferCore(previousOwner, _newOwner, currentTokenOwnerIndex[i], zeroData);
+		}
+
+		owner = _newOwner;
+
+		emit OwnershipTransferred(previousOwner, _newOwner);
+		return true;
+	}
+
 
 	// EIP-165
 	function supportsInterface(bytes4 interfaceID) external pure returns (bool) {

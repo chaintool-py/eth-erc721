@@ -1,1 +1,2 @@
 chainlib~=0.0.3a2
+eth_erc20~=0.0.9a2
