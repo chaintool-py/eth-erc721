@@ -53,7 +53,7 @@ class BadgeToken(ERC20):
     def gas(code=None):
         return 1200000
 
-
+    
     def constructor(self, sender_address, declarator, name, symbol, tx_format=TxFormat.JSONRPC):
         code = BadgeToken.bytecode()
         enc = ABIContractEncoder()
@@ -64,6 +64,10 @@ class BadgeToken(ERC20):
         tx = self.template(sender_address, None, use_nonce=True)
         tx = self.set_code(tx, code)
         return self.finalize(tx, tx_format)
+
+
+    def transfer(self, contract_address, sender_address, recipient_address, value, tx_format=TxFormat.JSONRPC):
+        raise NotImplementedError('EIP721 does not implement ERC20.transfer')
 
 
     def mint_to(self, contract_address, sender_address, address, token_id, tx_format=TxFormat.JSONRPC):
@@ -238,5 +242,3 @@ class BadgeToken(ERC20):
     @classmethod
     def parse_minted_at(self, v):
         return abi_decode_single(ABIContractType.UINT256, v)
-
-
