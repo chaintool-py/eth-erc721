@@ -65,6 +65,8 @@ class Test(EthTesterCase):
 
 
     def test_mint(self):
+        self.backend.mine_blocks(42)
+
         token_bytes = b'\xee' * 32
         token_id = int.from_bytes(token_bytes, byteorder='big')
         c = self._mint(self.accounts[1], token_id)
@@ -78,6 +80,12 @@ class Test(EthTesterCase):
         supply = c.parse_total_supply(r)
 
         self.assertEqual(supply, 1)
+
+        o = c.minted_at(self.address, token_id, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        height = c.parse_minted_at(r)
+
+        self.assertEqual(height, 44)
 
 
     def test_owner(self):
