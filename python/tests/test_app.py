@@ -19,6 +19,7 @@ from chainlib.eth.contract import (
         ABIContractType,
         )
 from chainlib.error import JSONRPCException
+from chainlib.eth.constant import ZERO_ADDRESS
 from hexathon import (
         add_0x,
         strip_0x,
@@ -93,6 +94,47 @@ class Test(EthTesterCase):
         o = c.token_of_owner_by_index(self.address, self.accounts[1], 0, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         self.assertEqual(token_bytes.hex(), strip_0x(r))
+
+
+    def test_approve(self):
+        token_bytes = b'\xee' * 32
+        token_id = int.from_bytes(token_bytes, byteorder='big')
+        c = self._mint(self.accounts[1], token_id)
+
+        nonce_oracle = RPCNonceOracle(self.accounts[1], self.rpc)
+        c = BadgeToken(self.chain_spec, signer=self.signer, nonce_oracle=nonce_oracle)
+        (tx_hash_hex, o) = c.approve(self.address, self.accounts[1], self.accounts[2], token_id)
+        r = self.rpc.do(o)
+
+        o = receipt(tx_hash_hex)
+        r = self.conn.do(o)
+        self.assertEqual(r['status'], 1)
+
+        o = c.get_approved(self.address, token_id, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        approved_address = c.parse_get_approved(r)
+        self.assertEqual(approved_address, self.accounts[2])
+
+        nonce_oracle = RPCNonceOracle(self.accounts[2], self.rpc)
+        c = BadgeToken(self.chain_spec, signer=self.signer, nonce_oracle=nonce_oracle)
+        (tx_hash_hex, o) = c.transfer_from(self.address, self.accounts[2], self.accounts[1], self.accounts[3], token_id)
+        r = self.rpc.do(o)
+
+        o = receipt(tx_hash_hex)
+        r = self.conn.do(o)
+        self.assertEqual(r['status'], 1)
+
+        o = c.owner_of(self.address, token_id, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        owner_address = c.parse_owner_of(r)
+        self.assertEqual(owner_address, self.accounts[3])
+
+        o = c.get_approved(self.address, token_id, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        approved_address = c.parse_get_approved(r)
+        self.assertEqual(approved_address, ZERO_ADDRESS)
+
+
 
     
     def test_operator(self):

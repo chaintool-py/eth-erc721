@@ -17,6 +17,7 @@ from hexathon import (
         add_0x,
         strip_0x,
         )
+from eth_erc20 import ERC20
 
 # local imports
 #from .interface import BadgeToken
@@ -25,7 +26,7 @@ moddir = os.path.dirname(__file__)
 datadir = os.path.join(moddir, 'data')
 
 
-class BadgeToken(TxFactory):
+class BadgeToken(ERC20):
 
     __abi = None
     __bytecode = None
@@ -71,22 +72,6 @@ class BadgeToken(TxFactory):
         enc.typ(ABIContractType.ADDRESS)
         enc.typ(ABIContractType.UINT256)
         enc.address(address)
-        enc.uint256(token_id)
-        data = enc.get()
-        tx = self.template(sender_address, contract_address, use_nonce=True)
-        tx = self.set_code(tx, data)
-        tx = self.finalize(tx, tx_format)
-        return tx
-
-
-    def transfer_from(self, contract_address, sender_address, holder_address, beneficiary_address, token_id, tx_format=TxFormat.JSONRPC):
-        enc = ABIContractEncoder()
-        enc.method('transferFrom')
-        enc.typ(ABIContractType.ADDRESS)
-        enc.typ(ABIContractType.ADDRESS)
-        enc.typ(ABIContractType.UINT256)
-        enc.address(holder_address)
-        enc.address(beneficiary_address)
         enc.uint256(token_id)
         data = enc.get()
         tx = self.template(sender_address, contract_address, use_nonce=True)
@@ -168,6 +153,21 @@ class BadgeToken(TxFactory):
         return self.is_approved_for_all(contract_address, token_id, operator_address, sender_address=sender_address)
 
 
+    def get_approved(self, contract_address, token_id, sender_address=ZERO_ADDRESS):
+        o = jsonrpc_template()
+        o['method'] = 'eth_call'
+        enc = ABIContractEncoder()
+        enc.method('getApproved')
+        enc.typ(ABIContractType.UINT256)
+        enc.uint256(token_id)
+        data = add_0x(enc.get())
+        tx = self.template(sender_address, contract_address)
+        tx = self.set_code(tx, data)
+        o['params'].append(self.normalize(tx))
+        o['params'].append('latest')
+        return o
+
+
     def token_of_owner_by_index(self, contract_address, holder_address, idx, sender_address=ZERO_ADDRESS):
         o = jsonrpc_template()
         o['method'] = 'eth_call'
@@ -177,19 +177,6 @@ class BadgeToken(TxFactory):
         enc.typ(ABIContractType.UINT256)
         enc.address(holder_address)
         enc.uint256(idx)
-        data = add_0x(enc.get())
-        tx = self.template(sender_address, contract_address)
-        tx = self.set_code(tx, data)
-        o['params'].append(self.normalize(tx))
-        o['params'].append('latest')
-        return o
-
-
-    def total_supply(self, contract_address, sender_address=ZERO_ADDRESS):
-        o = jsonrpc_template()
-        o['method'] = 'eth_call'
-        enc = ABIContractEncoder()
-        enc.method('totalSupply')
         data = add_0x(enc.get())
         tx = self.template(sender_address, contract_address)
         tx = self.set_code(tx, data)
@@ -226,3 +213,10 @@ class BadgeToken(TxFactory):
     @classmethod
     def parse_is_operator(self, v):
         return self.parse_is_approved_for_all(v)
+
+
+    @classmethod
+    def parse_get_approved(self, v):
+        return abi_decode_single(ABIContractType.ADDRESS, v)
+
+
