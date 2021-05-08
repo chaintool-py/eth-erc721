@@ -129,6 +129,21 @@ class ERC721(ERC20, EIP173):
         return o
 
 
+    def token_uri(self, contract_address, token_id, sender_address=ZERO_ADDRESS):
+        o = jsonrpc_template()
+        o['method'] = 'eth_call'
+        enc = ABIContractEncoder()
+        enc.method('tokenURI')
+        enc.typ(ABIContractType.UINT256)
+        enc.uint256(token_id)
+        data = add_0x(enc.get())
+        tx = self.template(sender_address, contract_address)
+        tx = self.set_code(tx, data)
+        o['params'].append(self.normalize(tx))
+        o['params'].append('latest')
+        return o
+
+
     @classmethod
     def parse_owner_of(self, v):
         return abi_decode_single(ABIContractType.ADDRESS, v)
@@ -162,3 +177,8 @@ class ERC721(ERC20, EIP173):
     @classmethod
     def parse_get_approved(self, v):
         return abi_decode_single(ABIContractType.ADDRESS, v)
+
+
+    @classmethod
+    def parse_token_uri(self, v):
+        return abi_decode_single(ABIContractType.STRING, v)

@@ -245,5 +245,16 @@ class Test(EthTesterCase):
             self.assertEqual(self.accounts[4], owner_address)
 
 
+    def test_token_uri(self):
+        token_bytes = b'\xee' * 32
+        token_id = int.from_bytes(token_bytes, byteorder='big')
+        c = self._mint(self.accounts[1], token_id)
+
+        o = c.token_uri(self.address, token_id, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        uri = c.parse_token_uri(r)
+        self.assertEqual(uri, 'sha256://' + token_bytes.hex()) 
+
+
 if __name__ == '__main__':
     unittest.main()

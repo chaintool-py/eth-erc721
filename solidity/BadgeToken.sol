@@ -156,6 +156,47 @@ contract BadgeToken {
 		return tokenOwnerIndex[_owner][_index];
 	}
 
+	// TODO: move to library function?
+	function toAscii(bytes32 _data) public pure returns(string memory) {
+		bytes memory out;
+		uint8 t;
+		uint256 c;
+
+		out = new bytes(64 + 9);
+		out[0] = "s";
+		out[1] = "h";
+		out[2] = "a";
+		out[3] = "2";
+		out[4] = "5";
+		out[5] = "6";
+		out[6] = ":";
+		out[7] = "/";
+		out[8] = "/";
+		
+		c = 9;	
+		for (uint256 i = 0; i < 32; i++) {
+			t = uint8(_data[i]) & 0x0f;
+			if (t < 10) {
+				out[c] = bytes1(t + 0x30);
+			} else {
+				out[c] = bytes1(t + 0x57);
+			}
+			t = (uint8(_data[i]) & 0xf0) >> 4;
+			if (t < 10) {
+				out[c+1] = bytes1(t + 0x30);
+			} else {
+				out[c+1] = bytes1(t + 0x57);
+			}
+			c += 2;
+		}
+		return string(out);
+	}
+
+	// ERC-721 (Metadata - optional)
+	function tokenURI(uint256 _tokenId) public view returns (string memory) {
+		return toAscii(bytes32(token[tokenIndex[_tokenId]]));
+	}
+
 	// Minter
 	function mintTo(address _beneficiary, uint256 _tokenId) external returns (bool) {
 		require(owner == msg.sender);
