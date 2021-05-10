@@ -1,32 +1,33 @@
 pragma solidity ^0.8.0;
 
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 contract BadgeToken {
 
 	// EIP 173
 	address public owner;
 
-	// Points to Declarator implementer
-	address public declarator;
+	uint256[] token; // token item registry
+	uint256[] tokenMintedAt; // block height mapping to token array
 	
-	uint256[] token;
-	uint256[] tokenMintedAt;
-	
-	mapping(uint256 => uint256) tokenIndex; // tokenId uint256 -> position in token array uint256
-	mapping(uint256 => address) tokenOwner; // tokenId uint256 -> owner address
-	mapping(address => uint256[]) tokenOwnerIndex; // owner address -> tokenId uint256
-	mapping(uint256 => uint256) tokenOwnerIdIndex; //
-	mapping(address => uint256) tokenOwnerCursor;
+	mapping(uint256 => uint256) tokenIndex; // tokenId to token array index
+	mapping(uint256 => address) tokenOwner; // tokenId to owner address
+	mapping(address => uint256[]) tokenOwnerIndex; // index of owned tokens by owner address
+	mapping(uint256 => uint256) tokenOwnerIdIndex; // index of owned token ids in tokenOwnerIndex
+	mapping(address => uint256) tokenOwnerCursor; // end of token owner index array
 
-	mapping(uint256 => address) tokenAllowance;
-	mapping(address => address) tokenOperator;
+	mapping(uint256 => address) tokenAllowance; // backend for approve
+	mapping(address => address) tokenOperator; // backend for setApprovalForAll
 
-	mapping(uint256 => bytes32[]) tokenData; // tokenId uint256 -> tokenData bytes32
+	mapping(uint256 => bytes32[]) tokenData; // store optional data submitted with safeTransferFrom
 
 	// ERC-721 (Metadata - optional)
 	string public name;
 
 	// ERC-721 (Metadata - optional)
 	string public symbol;
+
+	address public declarator; // Points to Declarator implementer
 
 	// ERC-721
 	event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
@@ -61,6 +62,7 @@ contract BadgeToken {
 		return tokenOwner[_tokenId];
 	}
 
+	// shared function for transfer methods
 	function transferCore(address _from, address _to, uint256 _tokenId, bytes memory _data) internal {
 		address currentTokenOwner;
 
@@ -156,7 +158,7 @@ contract BadgeToken {
 		return tokenOwnerIndex[_owner][_index];
 	}
 
-	// TODO: move to library function?
+	// create sha256 scheme URI from tokenId
 	function toURI(bytes32 _data) public pure returns(string memory) {
 		bytes memory out;
 		uint8 t;
@@ -262,6 +264,9 @@ contract BadgeToken {
 			return true;
 		}
 		if (interfaceID == 0x449a52f8) { // Minter
+			return true;
+		}
+		if (interfaceID == 0xf1b0aa15) { // FungibleMinter
 			return true;
 		}
 		if (interfaceID == 0x01ffc9a7) { // EIP 165
