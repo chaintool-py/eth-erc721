@@ -27,7 +27,7 @@ from hexathon import (
 
 
 # local imports
-from eth_badge_token import BadgeToken
+from eth_badgetoken import BadgeToken
 
 logging.basicConfig(level=logging.DEBUG)
 logg = logging.getLogger()
@@ -253,7 +253,7 @@ class Test(EthTesterCase):
         o = c.token_uri(self.address, token_id, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         uri = c.parse_token_uri(r)
-        self.assertEqual(uri, 'sha256://' + token_bytes.hex()) 
+        self.assertEqual(uri, 'sha256:' + token_bytes.hex()) 
 
 
 if __name__ == '__main__':

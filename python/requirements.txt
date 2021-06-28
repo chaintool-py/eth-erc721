@@ -1,3 +1,3 @@
-chainlib~=0.0.3a3
-eth-erc20~=0.0.9a2
-eth-owned~=0.0.1a5
+chainlib-eth~=0.0.5a1
+eth-erc20~=0.0.10a1
+eth-owned~=0.0.2a1

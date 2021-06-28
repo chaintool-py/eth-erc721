@@ -8,7 +8,7 @@ from chainlib.eth.contract import (
         ABIContractType,
         abi_decode_single,
         )
-from chainlib.jsonrpc import jsonrpc_template
+from chainlib.jsonrpc import JSONRPCRequest
 from chainlib.eth.constant import ZERO_ADDRESS
 from hexathon import (
         add_0x,
@@ -45,8 +45,9 @@ class ERC721(ERC20, EIP173):
         return self.set_approve_for_all(contract_address, sender_address, operator_address, False, tx_format=tx_format)
 
 
-    def token_by_index(self, contract_address, idx, sender_address=ZERO_ADDRESS):
-        o = jsonrpc_template()
+    def token_by_index(self, contract_address, idx, sender_address=ZERO_ADDRESS, id_generator=None):
+        j = JSONRPCRequest(id_generator)
+        o = j.template()
         o['method'] = 'eth_call'
         enc = ABIContractEncoder()
         enc.method('tokenByIndex')
@@ -57,11 +58,13 @@ class ERC721(ERC20, EIP173):
         tx = self.set_code(tx, data)
         o['params'].append(self.normalize(tx))
         o['params'].append('latest')
+        o = j.finalize(o)
         return o
 
 
-    def owner_of(self, contract_address, token_id, sender_address=ZERO_ADDRESS):
-        o = jsonrpc_template()
+    def owner_of(self, contract_address, token_id, sender_address=ZERO_ADDRESS, id_generator=None):
+        j = JSONRPCRequest(id_generator)
+        o = j.template()
         o['method'] = 'eth_call'
         enc = ABIContractEncoder()
         enc.method('ownerOf')
@@ -72,11 +75,13 @@ class ERC721(ERC20, EIP173):
         tx = self.set_code(tx, data)
         o['params'].append(self.normalize(tx))
         o['params'].append('latest')
+        o = j.finalize(o)
         return o
 
 
-    def is_approved_for_all(self, contract_address, holder_address, operator_address, sender_address=ZERO_ADDRESS):
-        o = jsonrpc_template()
+    def is_approved_for_all(self, contract_address, holder_address, operator_address, sender_address=ZERO_ADDRESS, id_generator=None):
+        j = JSONRPCRequest(id_generator)
+        o = j.template()
         o['method'] = 'eth_call'
         enc = ABIContractEncoder()
         enc.method('isApprovedForAll')
@@ -89,6 +94,7 @@ class ERC721(ERC20, EIP173):
         tx = self.set_code(tx, data)
         o['params'].append(self.normalize(tx))
         o['params'].append('latest')
+        o = j.finalize(o)
         return o
 
 
@@ -96,8 +102,9 @@ class ERC721(ERC20, EIP173):
         return self.is_approved_for_all(contract_address, token_id, operator_address, sender_address=sender_address)
 
 
-    def get_approved(self, contract_address, token_id, sender_address=ZERO_ADDRESS):
-        o = jsonrpc_template()
+    def get_approved(self, contract_address, token_id, sender_address=ZERO_ADDRESS, id_generator=None):
+        j = JSONRPCRequest(id_generator)
+        o = j.template()
         o['method'] = 'eth_call'
         enc = ABIContractEncoder()
         enc.method('getApproved')
@@ -108,12 +115,14 @@ class ERC721(ERC20, EIP173):
         tx = self.set_code(tx, data)
         o['params'].append(self.normalize(tx))
         o['params'].append('latest')
+        o = j.finalize(o)
         return o
 
 
 
-    def token_of_owner_by_index(self, contract_address, holder_address, idx, sender_address=ZERO_ADDRESS):
-        o = jsonrpc_template()
+    def token_of_owner_by_index(self, contract_address, holder_address, idx, sender_address=ZERO_ADDRESS, id_generator=None):
+        j = JSONRPCRequest(id_generator)
+        o = j.template()
         o['method'] = 'eth_call'
         enc = ABIContractEncoder()
         enc.method('tokenOfOwnerByIndex')
@@ -126,11 +135,13 @@ class ERC721(ERC20, EIP173):
         tx = self.set_code(tx, data)
         o['params'].append(self.normalize(tx))
         o['params'].append('latest')
+        o = j.finalize(o)
         return o
 
 
-    def token_uri(self, contract_address, token_id, sender_address=ZERO_ADDRESS):
-        o = jsonrpc_template()
+    def token_uri(self, contract_address, token_id, sender_address=ZERO_ADDRESS, id_generator=None):
+        j = JSONRPCRequest(id_generator)
+        o = j.template()
         o['method'] = 'eth_call'
         enc = ABIContractEncoder()
         enc.method('tokenURI')
@@ -141,6 +152,7 @@ class ERC721(ERC20, EIP173):
         tx = self.set_code(tx, data)
         o['params'].append(self.normalize(tx))
         o['params'].append('latest')
+        o = j.finalize(o)
         return o
 
 

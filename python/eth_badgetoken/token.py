@@ -11,7 +11,7 @@ from chainlib.eth.contract import (
         ABIContractType,
         abi_decode_single,
         )
-from chainlib.jsonrpc import jsonrpc_template
+from chainlib.jsonrpc import JSONRPCRequest
 from chainlib.eth.constant import ZERO_ADDRESS
 from hexathon import (
         add_0x,
@@ -79,8 +79,9 @@ class BadgeToken(ERC721):
 
 
 
-    def minted_at(self, contract_address, token_id, sender_address=ZERO_ADDRESS):
-        o = jsonrpc_template()
+    def minted_at(self, contract_address, token_id, sender_address=ZERO_ADDRESS, id_generator=None):
+        j = JSONRPCRequest(id_generator)
+        o = j.template()
         o['method'] = 'eth_call'
         enc = ABIContractEncoder()
         enc.method('mintedAt')
@@ -91,6 +92,7 @@ class BadgeToken(ERC721):
         tx = self.set_code(tx, data)
         o['params'].append(self.normalize(tx))
         o['params'].append('latest')
+        o = j.finalize(o)
         return o
 
 
