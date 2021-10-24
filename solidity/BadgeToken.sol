@@ -14,7 +14,7 @@ contract BadgeToken {
 	mapping(uint256 => address) tokenOwner; // tokenId to owner address
 	mapping(address => uint256[]) tokenOwnerIndex; // index of owned tokens by owner address
 	mapping(uint256 => uint256) tokenOwnerIdIndex; // index of owned token ids in tokenOwnerIndex
-	mapping(address => uint256) tokenOwnerCursor; // end of token owner index array
+	mapping(address => uint256) public tokenOwnerCount; // end of token owner index array
 
 	mapping(uint256 => address) tokenAllowance; // backend for approve
 	mapping(address => address) tokenOperator; // backend for setApprovalForAll
@@ -44,7 +44,7 @@ contract BadgeToken {
 	// Minter
 	event Mint(address indexed _minter, address indexed _beneficiary, uint256 value);
 
-	constructor(address _declarator, string memory _name, string memory _symbol) {
+	constructor(string memory _name, string memory _symbol, address _declarator) {
 		declarator = _declarator;
 		owner = msg.sender;
 		name = _name;
@@ -54,7 +54,7 @@ contract BadgeToken {
 
 	// ERC-721
 	function balanceOf(address _owner) external view returns (uint256) {
-		return tokenOwnerCursor[_owner];
+		return tokenOwnerCount[_owner];
 	}
 
 	// ERC-721
@@ -75,10 +75,10 @@ contract BadgeToken {
 		tokenAllowance[_tokenId] = address(0);
 
 		tokenOwnerIndex[_from][tokenOwnerIdIndex[_tokenId]] = tokenOwnerIndex[_from][tokenOwnerIndex[_from].length-1];
-		tokenOwnerCursor[_from]--;
+		tokenOwnerCount[_from]--;
 
 		tokenOwnerIndex[_to].push(_tokenId);
-		tokenOwnerCursor[_to]++;
+		tokenOwnerCount[_to]++;
 
 		tokenOwner[_tokenId] = _to;
 
@@ -153,7 +153,7 @@ contract BadgeToken {
 
 	// ERC-721 (Enumerable - optional)
 	function tokenOfOwnerByIndex(address _owner, uint256 _index) external view returns (uint256) {
-		require(_index < tokenOwnerCursor[_owner]);
+		require(_index < tokenOwnerCount[_owner]);
 
 		return tokenOwnerIndex[_owner][_index];
 	}
@@ -214,7 +214,7 @@ contract BadgeToken {
 		tokenOwner[newTokenId] = _beneficiary;
 		tokenOwnerIdIndex[tokenOwnerIndex[_beneficiary].length] = _tokenId;
 	       	tokenOwnerIndex[_beneficiary].push(_tokenId);	
-		tokenOwnerCursor[_beneficiary]++;
+		tokenOwnerCount[_beneficiary]++;
 
 		emit Mint(msg.sender, _beneficiary, _tokenId);
 

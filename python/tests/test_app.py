@@ -41,7 +41,8 @@ class Test(EthTesterCase):
         super(Test, self).setUp()
         nonce_oracle = RPCNonceOracle(self.accounts[0], self.rpc)
         c = BadgeToken(self.chain_spec, signer=self.signer, nonce_oracle=nonce_oracle)
-        (tx_hash, o) = c.constructor(self.accounts[0], b'\x00' * 20, 'DevBadge', 'DEV')
+        #(tx_hash, o) = c.constructor(self.accounts[0], b'\x00' * 20, 'DevBadge', 'DEV')
+        (tx_hash, o) = c.constructor(self.accounts[0], 'DevBadge', 'DEV', self.accounts[1])
         self.conn = RPCConnection.connect(self.chain_spec, 'default')
         r = self.conn.do(o)
         logg.debug('deployed with hash {}'.format(r))
@@ -95,7 +96,7 @@ class Test(EthTesterCase):
         o = c.owner_of(self.address, token_id, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         owner_address = c.parse_owner_of(r)
-        self.assertEqual(self.accounts[1], owner_address)
+        self.assertEqual(strip_0x(self.accounts[1]), owner_address)
 
         o = c.token_of_owner_by_index(self.address, self.accounts[1], 0, sender_address=self.accounts[0])
         r = self.rpc.do(o)
@@ -119,7 +120,7 @@ class Test(EthTesterCase):
         o = c.get_approved(self.address, token_id, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         approved_address = c.parse_get_approved(r)
-        self.assertEqual(approved_address, self.accounts[2])
+        self.assertEqual(approved_address, strip_0x(self.accounts[2]))
 
         nonce_oracle = RPCNonceOracle(self.accounts[2], self.rpc)
         c = BadgeToken(self.chain_spec, signer=self.signer, nonce_oracle=nonce_oracle)
@@ -133,12 +134,12 @@ class Test(EthTesterCase):
         o = c.owner_of(self.address, token_id, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         owner_address = c.parse_owner_of(r)
-        self.assertEqual(owner_address, self.accounts[3])
+        self.assertEqual(owner_address, strip_0x(self.accounts[3]))
 
         o = c.get_approved(self.address, token_id, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         approved_address = c.parse_get_approved(r)
-        self.assertEqual(approved_address, ZERO_ADDRESS)
+        self.assertEqual(approved_address, strip_0x(ZERO_ADDRESS))
 
 
 
@@ -189,7 +190,7 @@ class Test(EthTesterCase):
         o = c.owner_of(self.address, token_id, sender_address=self.accounts[0])
         r = self.rpc.do(o)
         owner_address = c.parse_owner_of(r)
-        self.assertEqual(owner_address, self.accounts[3])
+        self.assertEqual(owner_address, strip_0x(self.accounts[3]))
 
 
     def test_transfer(self):
@@ -242,7 +243,7 @@ class Test(EthTesterCase):
             o = c.owner_of(self.address, token_id, sender_address=self.accounts[0])
             r = self.rpc.do(o)
             owner_address = c.parse_owner_of(r)
-            self.assertEqual(self.accounts[4], owner_address)
+            self.assertEqual(strip_0x(self.accounts[4]), owner_address)
 
 
     def test_token_uri(self):

@@ -15,6 +15,7 @@ from chainlib.jsonrpc import JSONRPCRequest
 from chainlib.eth.constant import ZERO_ADDRESS
 from hexathon import (
         add_0x,
+        strip_0x,
         )
 
 # local imports
@@ -52,12 +53,13 @@ class BadgeToken(ERC721):
         return 3500000
 
     
-    def constructor(self, sender_address, declarator, name, symbol, tx_format=TxFormat.JSONRPC):
+    def constructor(self, sender_address, name, symbol, declarator, tx_format=TxFormat.JSONRPC):
+        declarator = strip_0x(declarator)
         code = BadgeToken.bytecode()
         enc = ABIContractEncoder()
-        enc.address(declarator)
         enc.string(name)
         enc.string(symbol)
+        enc.address(declarator)
         code += enc.get()
         tx = self.template(sender_address, None, use_nonce=True)
         tx = self.set_code(tx, code)
