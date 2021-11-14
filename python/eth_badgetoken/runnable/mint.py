@@ -54,7 +54,14 @@ chain_spec = ChainSpec.from_chain_str(config.get('CHAIN_SPEC'))
 
 token_id_bytes = bytes.fromhex(strip_0x(config.get('_TOKEN_ID')))
 if len(token_id_bytes) != 32:
-    raise ValueError('token id must be 32 bytes')
+    token_id_int = None
+    try:
+        token_id_int = int(config.get('_TOKEN_ID'))
+    except:
+        token_id_int = strip_0x(config.get('_TOKEN_ID'))
+        token_id_int = int(token_id_int, 16)
+    token_id_bytes = token_id_int.to_bytes(32, byteorder='big')
+    logg.info('numeric token id value {} parsed to {}'.format(config.get('_TOKEN_ID'), token_id_bytes.hex()))
 token_id = int.from_bytes(token_id_bytes, byteorder='big')
 
 
