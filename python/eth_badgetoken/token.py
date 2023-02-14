@@ -40,7 +40,7 @@ class BadgeToken(ERC721):
 
 
     @staticmethod
-    def bytecode():
+    def bytecode(version=None):
         if BadgeToken.__bytecode == None:
             f = open(os.path.join(datadir, 'BadgeToken.bin'))
             BadgeToken.__bytecode = f.read()
@@ -53,7 +53,14 @@ class BadgeToken(ERC721):
         return 3500000
 
     
-    def constructor(self, sender_address, name, symbol, declarator, tx_format=TxFormat.JSONRPC):
+    def constructor(self, sender_address, name, symbol, declarator, tx_format=TxFormat.JSONRPC, version=None):
+        code = self.cargs(name, symbol, declarator, version=version)
+        tx = self.template(sender_address, None, use_nonce=True)
+        tx = self.set_code(tx, code)
+        return self.finalize(tx, tx_format)
+
+    @staticmethod
+    def cargs(name, symbol, declarator, version=None):
         declarator = strip_0x(declarator)
         code = BadgeToken.bytecode()
         enc = ABIContractEncoder()
@@ -61,9 +68,7 @@ class BadgeToken(ERC721):
         enc.string(symbol)
         enc.address(declarator)
         code += enc.get()
-        tx = self.template(sender_address, None, use_nonce=True)
-        tx = self.set_code(tx, code)
-        return self.finalize(tx, tx_format)
+        return code
 
 
     def mint_to(self, contract_address, sender_address, address, token_id, tx_format=TxFormat.JSONRPC):
@@ -101,3 +106,19 @@ class BadgeToken(ERC721):
     @classmethod
     def parse_minted_at(self, v):
         return abi_decode_single(ABIContractType.UINT256, v)
+
+
+def bytecode(**kwargs):
+    return BadgeToken.bytecode(version=kwargs.get('version'))
+
+
+def create(**kwargs):
+    return BadgeToken.cargs(kwargs['name'], kwargs['symbol'], kwargs['declarator'], version=kwargs.get('version'))
+
+
+def args(v):
+    if v == 'create':
+        return (['name', 'symbol', 'declarator'], ['version'],)
+    elif v == 'default' or v == 'bytecode':
+        return ([], ['version'],)
+    raise ValueError('unknown command: ' + v)
