@@ -1,3 +1,9 @@
+- 0.0.7
+	* Move interface tests and test token publish to unittest module
+- 0.0.6
+	* Implement chainlib-gen for eth badgetoken'
+- 0.0.5
+	* Add transfer cli tool
 - 0.0.4
 	* Change license to AGPL3 and copyright waived to public domain
 - 0.0.3
