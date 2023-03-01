@@ -1,4 +1,4 @@
-- 0.0.7
+- 0.1.0
 	* Move interface tests and test token publish to unittest module
 - 0.0.6
 	* Implement chainlib-gen for eth badgetoken'
