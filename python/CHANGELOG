@@ -1,3 +1,5 @@
+- 0.1.1
+	* Fix block height test in mint unittest
 - 0.1.0
 	* Move interface tests and test token publish to unittest module
 - 0.0.6
