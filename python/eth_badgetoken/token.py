@@ -85,7 +85,6 @@ class BadgeToken(ERC721):
         return tx
 
 
-
     def minted_at(self, contract_address, token_id, sender_address=ZERO_ADDRESS, id_generator=None):
         j = JSONRPCRequest(id_generator)
         o = j.template()

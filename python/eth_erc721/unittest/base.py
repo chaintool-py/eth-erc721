@@ -1,12 +1,19 @@
+# standard imports
+import logging
+
 # external imports
 from hexathon import strip_0x
 from chainlib.eth.nonce import RPCNonceOracle
 from chainlib.eth.tx import receipt
 from chainlib.eth.constant import ZERO_ADDRESS
+from chainlib.eth.block import block_latest
 from chainlib.jsonrpc import JSONRPCException
 
 # local imports
 from eth_badgetoken import BadgeToken 
+
+logg = logging.getLogger(__name__)
+
 
 class TestInterface:
 
@@ -67,6 +74,10 @@ class TestInterface:
             self.assertEqual(strip_0x(self.accounts[4]), owner_address)
 
     def test_mint(self):
+        o = block_latest()
+        r = self.rpc.do(o)
+        block_start = int(r)
+         
         self.backend.mine_blocks(42)
 
         token_bytes = b'\xee' * 32
@@ -86,7 +97,7 @@ class TestInterface:
         r = self.rpc.do(o)
         height = c.parse_minted_at(r)
 
-        self.assertEqual(height, 44)
+        self.assertEqual(height, block_start + 42 + 1)
 
 
     def test_approve(self):
