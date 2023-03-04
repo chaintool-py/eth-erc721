@@ -1,3 +1,5 @@
+- 0.1.2
+	* Add base url feature to badgetoken
 - 0.1.1
 	* Fix block height test in mint unittest
 - 0.1.0
