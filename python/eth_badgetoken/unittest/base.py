@@ -43,7 +43,6 @@ class TestBadgeToken(EthTesterCase):
         super(TestBadgeToken, self).setUp()
         nonce_oracle = RPCNonceOracle(self.accounts[0], self.rpc)
         c = BadgeToken(self.chain_spec, signer=self.signer, nonce_oracle=nonce_oracle)
-        #(tx_hash, o) = c.constructor(self.accounts[0], b'\x00' * 20, 'DevBadge', 'DEV')
         (tx_hash, o) = c.constructor(self.accounts[0], 'DevBadge', 'DEV', self.accounts[1])
         self.conn = RPCConnection.connect(self.chain_spec, 'default')
         r = self.conn.do(o)

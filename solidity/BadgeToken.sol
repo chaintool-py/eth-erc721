@@ -44,6 +44,8 @@ contract BadgeToken {
 	// Minter
 	event Mint(address indexed _minter, address indexed _beneficiary, uint256 value);
 
+	bytes public baseURL;
+
 	constructor(string memory _name, string memory _symbol, address _declarator) {
 		declarator = _declarator;
 		owner = msg.sender;
@@ -159,21 +161,44 @@ contract BadgeToken {
 	}
 
 	// create sha256 scheme URI from tokenId
-	function toURI(bytes32 _data) public pure returns(string memory) {
+	function toURI(bytes memory _data) public pure returns(string memory) {
+		bytes memory hx;
+	
+		hx = getDigestHex(_data);	
+		return string(bytes.concat("sha256:", hx));
+	}
+
+	function toURL(bytes memory _data) public view returns(string memory) {
+		bytes memory out;
+		bytes memory _hexDigest;
+		uint256 c;
+
+		if (baseURL.length == 0) {
+			return toURI(_data);
+		}
+
+		_hexDigest = getDigestHex(_data);
+	
+		c = baseURL.length;
+		out = new bytes(_hexDigest.length + c);
+
+		for (uint256 i = 0; i < c; i++) {
+			out[i] = baseURL[i];
+		}
+		for (uint256 i = 0; i < _hexDigest.length; i++) {
+			out[c] = _hexDigest[i];
+			c++;
+		}
+		return string(out);
+	}
+
+	function getDigestHex(bytes memory _data) public pure returns(bytes memory) {
 		bytes memory out;
 		uint8 t;
 		uint256 c;
 
-		out = new bytes(64 + 7);
-		out[0] = "s";
-		out[1] = "h";
-		out[2] = "a";
-		out[3] = "2";
-		out[4] = "5";
-		out[5] = "6";
-		out[6] = ":";
-		
-		c = 7;	
+		out = new bytes(_data.length * 2);
+		c = 0;
 		for (uint256 i = 0; i < 32; i++) {
 			t = (uint8(_data[i]) & 0xf0) >> 4;
 			if (t < 10) {
@@ -189,12 +214,41 @@ contract BadgeToken {
 			}
 			c += 2;
 		}
-		return string(out);
+		return out;
 	}
 
 	// ERC-721 (Metadata - optional)
 	function tokenURI(uint256 _tokenId) public view returns (string memory) {
-		return toURI(bytes32(token[tokenIndex[_tokenId]]));
+		bytes32 _tokenIdBytesFixed;
+		bytes memory _tokenIdBytes;
+		
+		_tokenIdBytesFixed = bytes32(_tokenId);
+	
+		_tokenIdBytes = new bytes(32);
+		for (uint256 i = 0; i < 32; i++) {
+			_tokenIdBytes[i] = _tokenIdBytesFixed[i];
+		}
+
+		return toURL(_tokenIdBytes);
+	}
+
+	function setBaseURL(string memory _baseString) public {
+		bytes memory _base;
+		uint256 l;
+		require(msg.sender == owner);
+		
+		_base = bytes(_baseString);
+		l = _base.length;
+		if (_base[l-1] != 0x2f) {
+			l++;
+		}
+		baseURL = new bytes(l);
+		for (uint256 i = 0; i < _base.length; i++) {
+			baseURL[i] = _base[i];
+		}
+		if (l != _base.length) {
+			baseURL[_base.length] = "/";
+		}
 	}
 
 	// Minter
