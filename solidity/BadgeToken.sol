@@ -27,8 +27,6 @@ contract BadgeToken {
 	// ERC-721 (Metadata - optional)
 	string public symbol;
 
-	address public declarator; // Points to Declarator implementer
-
 	// ERC-721
 	event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
 	// ERC-721
@@ -44,13 +42,11 @@ contract BadgeToken {
 	// Minter
 	event Mint(address indexed _minter, address indexed _beneficiary, uint256 value);
 
-	constructor(string memory _name, string memory _symbol, address _declarator) {
-		declarator = _declarator;
+	constructor(string memory _name, string memory _symbol) {
 		owner = msg.sender;
 		name = _name;
 		symbol = _symbol;
 	}
-
 
 	// ERC-721
 	function balanceOf(address _owner) external view returns (uint256) {
@@ -221,8 +217,8 @@ contract BadgeToken {
 		return true;
 	}
 
-	// FungibleMinter
-	function mintedAt(uint256 _tokenId) public view returns (uint256) {
+	// Chrono
+	function createdAt(uint256 _tokenId) public view returns (uint256) {
 		uint256 _tokenIndex;
 
 		_tokenIndex = tokenIndex[_tokenId];
@@ -236,7 +232,7 @@ contract BadgeToken {
 
 		bytes memory zeroData;
 		address previousOwner;
-		uint256[] memory currentTokenOwnerIndex; // investigate; if source is storage, which of memory or storage does a copy
+		uint256[] storage currentTokenOwnerIndex;
 
 		previousOwner = owner;
 		currentTokenOwnerIndex = tokenOwnerIndex[previousOwner];

@@ -7,7 +7,7 @@ from eth_owned.unittest import TestInterface as TestInterfaceOwned
 
 # local imports
 from eth_badgetoken.unittest import TestBadgeToken
-from eth_erc721.unittest.enum import TestInterface
+from eth_badgetoken.unittest.interface import TestInterface
 
 logg = logging.getLogger()
 

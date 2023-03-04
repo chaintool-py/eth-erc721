@@ -8,6 +8,7 @@ import logging
 from chainlib.eth.unittest.ethtester import EthTesterCase
 from chainlib.connection import RPCConnection
 from chainlib.eth.nonce import RPCNonceOracle
+from chainlib.eth.block import block_latest
 from chainlib.eth.address import to_checksum_address
 from chainlib.eth.tx import (
         receipt,

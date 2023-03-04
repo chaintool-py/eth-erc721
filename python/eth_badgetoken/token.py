@@ -85,12 +85,12 @@ class BadgeToken(ERC721):
         return tx
 
 
-    def minted_at(self, contract_address, token_id, sender_address=ZERO_ADDRESS, id_generator=None):
+    def created_at(self, contract_address, token_id, sender_address=ZERO_ADDRESS, id_generator=None):
         j = JSONRPCRequest(id_generator)
         o = j.template()
         o['method'] = 'eth_call'
         enc = ABIContractEncoder()
-        enc.method('mintedAt')
+        enc.method('createdAt')
         enc.typ(ABIContractType.UINT256)
         enc.uint256(token_id)
         data = add_0x(enc.get())
@@ -103,7 +103,7 @@ class BadgeToken(ERC721):
 
 
     @classmethod
-    def parse_minted_at(self, v):
+    def parse_created_at(self, v):
         return abi_decode_single(ABIContractType.UINT256, v)
 
 

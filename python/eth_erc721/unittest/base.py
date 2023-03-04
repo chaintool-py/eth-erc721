@@ -6,7 +6,6 @@ from hexathon import strip_0x
 from chainlib.eth.nonce import RPCNonceOracle
 from chainlib.eth.tx import receipt
 from chainlib.eth.constant import ZERO_ADDRESS
-from chainlib.eth.block import block_latest
 from chainlib.jsonrpc import JSONRPCException
 
 # local imports
@@ -74,12 +73,6 @@ class TestInterface:
             self.assertEqual(strip_0x(self.accounts[4]), owner_address)
 
     def test_mint(self):
-        o = block_latest()
-        r = self.rpc.do(o)
-        block_start = int(r)
-         
-        self.backend.mine_blocks(42)
-
         token_bytes = b'\xee' * 32
         token_id = int.from_bytes(token_bytes, byteorder='big')
         c = self._mint(self.accounts[1], token_id)
@@ -92,12 +85,6 @@ class TestInterface:
         r = self.rpc.do(o)
         supply = c.parse_total_supply(r)
         self.assertEqual(supply, 1)
-
-        o = c.minted_at(self.address, token_id, sender_address=self.accounts[0])
-        r = self.rpc.do(o)
-        height = c.parse_minted_at(r)
-
-        self.assertEqual(height, block_start + 42 + 1)
 
 
     def test_approve(self):
