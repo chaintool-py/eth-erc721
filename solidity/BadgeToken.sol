@@ -250,19 +250,16 @@ contract BadgeToken {
 
 	// EIP-165
 	function supportsInterface(bytes4 interfaceID) external pure returns (bool) {
-		if (interfaceID == 0x80ac58cd) { // EIP 721
+		if (interfaceID == 0xc22876c3) { // EIP 721
 			return true;
 		}
-		if (interfaceID == 0x5b5e139f) { // EIP 721 (Metadata - optional)
+		if (interfaceID == 0xd283ef1d) { // EIP 721 (Metadata - optional)
 			return true;
 		}
-		if (interfaceID == 0x780e9d63) { // EIP 721 (Enumerable - optional)
+		if (interfaceID == 0xdd9d2087) { // EIP 721 (Enumerable - optional)
 			return true;
 		}
 		if (interfaceID == 0x449a52f8) { // Minter
-			return true;
-		}
-		if (interfaceID == 0xf1b0aa15) { // FungibleMinter
 			return true;
 		}
 		if (interfaceID == 0x01ffc9a7) { // EIP 165
