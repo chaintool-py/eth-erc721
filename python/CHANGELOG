@@ -1,3 +1,7 @@
+- 0.1.5
+	* Fix non-trivial issues for BadgeToken reported by slither (0.9.3)
+- 0.1.4
+	* Upgrade deps
 - 0.1.3
 	* Correct interface signatures in contract (ERC165)
 - 0.1.2

@@ -47,6 +47,11 @@ contract BadgeToken {
 		name = _name;
 		symbol = _symbol;
 	}
+	
+	function withdraw(uint256 _amount) public returns(bool) {
+		require(msg.sender == owner, 'ERR_ACCESS');
+		payable(msg.sender).transfer(_amount);
+	}
 
 	// ERC-721
 	function balanceOf(address _owner) external view returns (uint256) {
@@ -78,7 +83,7 @@ contract BadgeToken {
 
 		tokenOwner[_tokenId] = _to;
 
-		for (uint256 i; i < _data.length; i++) {
+		for (uint256 i = 0; i < _data.length; i++) {
 			tokenData[_tokenId][i % 32] = _data[i];
 		}
 	}
@@ -87,6 +92,7 @@ contract BadgeToken {
 	function transferFrom(address _from, address _to, uint256 _tokenId) external payable {
 		bytes memory _data;
 
+		_data = new bytes(0);
 		transferCore(_from, _to, _tokenId, _data);
 		emit Transfer(_from, _to, _tokenId);
 	}
@@ -102,6 +108,7 @@ contract BadgeToken {
 	function safeTransferFrom(address _from, address _to, uint256 _tokenId) external payable {
 		bytes memory _data;
 
+		_data = new bytes(0);
 		transferCore(_from, _to, _tokenId, _data);
 		emit Transfer(_from, _to, _tokenId);
 	}
@@ -237,7 +244,8 @@ contract BadgeToken {
 		previousOwner = owner;
 		currentTokenOwnerIndex = tokenOwnerIndex[previousOwner];
 
-		for (uint256 i; i < currentTokenOwnerIndex.length; i++) {
+		zeroData = new bytes(0);
+		for (uint256 i = 0; i < currentTokenOwnerIndex.length; i++) {
 			transferCore(previousOwner, _newOwner, currentTokenOwnerIndex[i], zeroData);
 		}
 
