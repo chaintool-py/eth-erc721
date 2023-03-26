@@ -17,7 +17,7 @@ class TestInterface(TestInterfaceBase):
         token_id = int.from_bytes(token_bytes, byteorder='big')
         c = self._mint(self.accounts[1], token_id)
 
-        o = c.created_at(self.address, token_id, sender_address=self.accounts[0])
+        o = c.start_time(self.address, token_id, sender_address=self.accounts[0])
         r = self.rpc.do(o)
-        height = c.parse_created_at(r)
+        height = c.parse_start_time(r)
         self.assertEqual(height, block_start + 42 + 1)

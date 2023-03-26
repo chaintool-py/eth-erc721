@@ -14,10 +14,10 @@ from hexathon import (
         add_0x,
         )
 from eth_erc20 import ERC20
-from eth_owned import EIP173
+from eth_owned import ERC173
 
 
-class ERC721(ERC20, EIP173):
+class ERC721(ERC20, ERC173):
 
     def transfer(self, contract_address, sender_address, recipient_address, value, tx_format=TxFormat.JSONRPC):
         raise NotImplementedError('EIP721 does not implement ERC20.transfer')

@@ -1,3 +1,4 @@
 chainlib-eth~=0.4.16
 chainlib~=0.4.12
 eth-erc20~=0.7.1
+eth-owned~=0.1.0
