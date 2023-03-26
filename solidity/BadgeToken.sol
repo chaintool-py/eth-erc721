@@ -234,13 +234,18 @@ contract BadgeToken {
 		mintTo(_beneficiary, _tokenId);
 	}
 
-	// Implements ERC5007
-	function startTime(uint256 _tokenId) public view returns (uint256) {
+	// Implements Chrono
+	function createTime(uint256 _idx) public view returns (int64) {
 		uint256 _tokenIndex;
 
-		_tokenIndex = tokenIndex[_tokenId];
+		_tokenIndex = tokenIndex[_idx];
 
-		return tokenMintedAt[_tokenIndex];
+		return int64(uint64(tokenMintedAt[_tokenIndex]));
+	}
+
+	// Implements ERC5007
+	function startTime(uint256 _tokenId) public view returns (int64) {
+		return createTime(_tokenId);
 	}
 
 	// Implements ERC173

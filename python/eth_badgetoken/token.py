@@ -85,6 +85,23 @@ class BadgeToken(ERC721):
         return tx
 
 
+    def create_time(self, contract_address, token_id, sender_address=ZERO_ADDRESS, id_generator=None):
+        j = JSONRPCRequest(id_generator)
+        o = j.template()
+        o['method'] = 'eth_call'
+        enc = ABIContractEncoder()
+        enc.method('createTime')
+        enc.typ(ABIContractType.UINT256)
+        enc.uint256(token_id)
+        data = add_0x(enc.get())
+        tx = self.template(sender_address, contract_address)
+        tx = self.set_code(tx, data)
+        o['params'].append(self.normalize(tx))
+        o['params'].append('latest')
+        o = j.finalize(o)
+        return o
+
+
     def start_time(self, contract_address, token_id, sender_address=ZERO_ADDRESS, id_generator=None):
         j = JSONRPCRequest(id_generator)
         o = j.template()
@@ -120,11 +137,7 @@ class BadgeToken(ERC721):
 
 
     @classmethod
-    def parse_start_time(self, v):
-        return abi_decode_single(ABIContractType.UINT256, v)
-
-    @classmethod
-    def parse_end_time(self, v):
+    def parse_time(self, v):
         return abi_decode_single(ABIContractType.UINT256, v)
 
 

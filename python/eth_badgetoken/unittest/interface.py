@@ -19,5 +19,10 @@ class TestInterface(TestInterfaceBase):
 
         o = c.start_time(self.address, token_id, sender_address=self.accounts[0])
         r = self.rpc.do(o)
-        height = c.parse_start_time(r)
+        height = c.parse_time(r)
+        self.assertEqual(height, block_start + 42 + 1)
+
+        o = c.create_time(self.address, token_id, sender_address=self.accounts[0])
+        r = self.rpc.do(o)
+        height = c.parse_time(r)
         self.assertEqual(height, block_start + 42 + 1)
