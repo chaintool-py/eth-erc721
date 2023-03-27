@@ -229,6 +229,12 @@ contract BadgeToken {
 	}
 
 	// Implements Minter
+	function mint(address _beneficiary, uint256 _tokenId, bytes calldata _data) public {
+		_data;
+		mintTo(_beneficiary, _tokenId);
+	}
+
+	// Implements Minter
 	function safeMint(address _beneficiary, uint256 _tokenId, bytes calldata _data) public {
 		_data;
 		mintTo(_beneficiary, _tokenId);
