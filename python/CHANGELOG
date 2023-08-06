@@ -1,3 +1,9 @@
+- 0.3.0
+	* Upgrade dependencies
+- 0.2.1
+	* Update minter interface
+- 0.2.0
+	* Implement Chrono / time interface
 - 0.1.6
 	* Update python package classifiers
 	* Upgrade to beta
