@@ -1,2 +1,2 @@
-eth_tester==0.5.0b3
-py-evm==0.3.0a20
+eth_tester==0.10.0b4
+py-evm==0.10.0b4
